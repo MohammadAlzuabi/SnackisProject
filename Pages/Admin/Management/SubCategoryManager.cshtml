@@ -1,0 +1,70 @@
+﻿@page
+@model SnackisProject.Pages.Admin.Management.SubCategoryManagerModel
+@{
+    ViewData["Title"] = "SubCategory Manager";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/Index">Admin kontrollpanel</a></li>
+        <li class="breadcrumb-item"><a asp-page="/CategoryManager">Category Manager</a></li>
+        <li class="breadcrumb-item active" aria-current="page">SubCategory Manager</li>
+
+    </ol>
+</nav>
+<p class="display-4 text-center">Subcategory Manager</p>
+
+@if (Model.Category != null)
+{
+    <h5 class="text-center">Managing Subcategories for Category <h5 class="text-center text-danger">@Model.Category.Name</h5></h5>
+}
+
+<div class="row justify-content-center">
+    <div class="col-6 m-2">
+        <form method="post" asp-page-handler="CreateSubCategory">
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <label asp-for="SubCategory.Name" class="control-label"></label>
+                    <input asp-for="SubCategory.Name" class="form-control w-100 mr-2">       
+                    <input type="hidden" asp-for="SubCategory.CategoryId" value="@Model.Category.Id" />
+                </div>
+                <div class="col-8">
+                    <button class="btn btn-info">Add New SubCategory</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<hr class="my-4" />
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var subCategory in Model.SubCategories.Where(s => s.CategoryId == Model.Category.Id))
+        {
+            <tr>
+                <td>@subCategory.Id</td>
+                <td>@subCategory.Name</td>
+                <td>
+                    <div class="row">
+                        <div class="col-2">
+                            <form method="post" asp-page-handler="DeleteSubCategory">
+                                <input type="hidden" value="@subCategory.Id" />
+                                <a asp-route-deleteSubCategory="@subCategory.Id" class="btn btn-danger">Delete</a>
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

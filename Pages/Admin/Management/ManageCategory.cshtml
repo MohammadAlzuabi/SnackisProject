@@ -1,0 +1,73 @@
+﻿@page
+@model SnackisProject.Pages.Admin.Management.ManageCategoryModel
+@{
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/Index">Admin kontrollpanel</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Manage Category</li>
+
+    </ol>
+</nav>
+
+<p class="display-4 text-center">Manage Category</p>
+
+<hr class="my-4" />
+
+<div class="row justify-content-center">
+    <div class="col-6 m-2">
+        <form method="post" asp-page-handler="EditCategory">
+            <input asp-for="EditCategory.Id" type="hidden" />
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <input asp-for="EditCategory.Name" class="form-control w-100 mr-2" />
+                    <span asp-validation-for="EditCategory.Name" class="text-danger"></span>
+                </div>
+                <div class="col-4">
+                    <input type="submit" value="Edit Category" class="btn btn-info" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Categories != null)
+        {
+            @foreach (var category in Model.Categories.OrderBy(r => r.Name))
+            {
+                <tr>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-2">
+                                <form method="post">
+                                    <input type="hidden" value="@category.Id" />
+                                    <a asp-route-deleteCategory="@category.Id" class="btn btn-danger">Delete</a>
+
+                                    <div class="col">
+                                    <td>
+                                        <a asp-route-editCategory="@category.Id" class="btn btn-info">Edit</a>
+                                    </td>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>

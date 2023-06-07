@@ -1,0 +1,39 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Startsida</li>
+    </ol>
+</nav>
+
+<div class="text-center"> 
+    <p class="display-3">Välkommen</p>
+</div>
+<br />
+<hr class="my-2" />
+
+<div class="row justify-content-center">
+    <div class="col-8 rounded border p-2">
+        <h1 class="text-center">Kategorier och ämnen</h1>
+        @foreach (var category in Model.Categories)
+        {
+            <div class="row justify-content-center">
+                <div class="col-8 rounded border shadow mb-2 p-2">
+                    <h3 class="text-center">@category.Name</h3>
+                    @foreach (var subCategory in Model.SubCategories.Where(s => s.CategoryId == category.Id))
+                    {
+                        <div class="row justify-content-center">
+                            <div class="col m-2">
+                                <a class="page-link text-center" asp-page="SubCategory" asp-route-subCategoryId="@subCategory.Id"><h5>@subCategory.Name</h5></a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,46 @@
+﻿@page
+@model SnackisProject.Pages.Admin.Management.ManageUserRolesModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Dashboard">Admin kontrollpanel</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/UserRolesManager">User Manager</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Manage User Roles</li>
+    </ol>
+</nav>
+
+<p class="display-4 text-center">Manage User Roles</p>
+
+<hr class="my-4" />
+
+<h5 class="text-center">Add/Remove Roles for User / @Model.Username.</h5>
+
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form method="post">
+            <div class="row row-cols-5">
+                @for (int i = 0; i < Model.ManageUserWithRolesList.Count; i++)
+                {
+                    <div class="col">
+                        <div class="form-check m-1">
+                            <input type="hidden" asp-for="@Model.ManageUserWithRolesList[i].RoleId" />
+                            <input type="hidden" asp-for="@Model.ManageUserWithRolesList[i].RoleName" />
+                            <input asp-for="@Model.ManageUserWithRolesList[i].Selected" class="form-check-input" />
+                            <label class="form-check-label" asp-for="@Model.ManageUserWithRolesList[i].Selected">
+                                @Model.ManageUserWithRolesList[i].RoleName
+                            </label>
+                        </div>
+                    </div>
+                }
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+            <div class="card-footer text-center">
+                <input type="submit" value="Update" class="btn btn-primary" style="width: auto" />
+                <a asp-page="UserRolesManager" class="btn btn-primary" style="width: auto">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

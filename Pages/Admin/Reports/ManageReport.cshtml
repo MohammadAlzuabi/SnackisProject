@@ -1,0 +1,59 @@
+﻿@page
+@model SnackisProject.Pages.Admin.Reports.ManageReportModel
+@using Microsoft.AspNetCore.Identity;
+@using SnackisProject.Areas.Identity.Data;
+@using SnackisProject.Models
+@inject UserManager<SnackisUser> UserManager
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/Index">Admin kontrollpanel</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Reports/ReportsPage">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Manage Report</li>
+    </ol>
+</nav>
+
+<div class="row text-center">
+    <p class="display-4">Manage Report</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-10 shadow text-center">
+        <p class="h5 fw-bolder">Managing report by @Model.Report.ByUser.UserName created at @Model.Report.CreatedAt</p>
+        @if (Model.Report.Post != null)
+        {
+            <div class="row justify-content-center">
+                <div class="col-6 shadow">
+                    <p class="fs-5 fw-bolder ">Post</p>
+                    <p class="text-primary fs-7 fw-bolder">@Model.Report.Post.Title</p>
+                    <p class="text-primary fs-7 fw-bolder">@Model.Report.Post.Text</p>
+                    <p class="fs-5 fw-bolder">From User</p>
+                    <p class="text-danger fs-7 fw-bolder">@Model.Report.ByUser.UserName</p>
+                    <p class="text-danger fs-7 fw-bolder">@Model.Report.CreatedAt</p>
+                    <form method="post" asp-page-handler="DeletePost">
+                        <input type="hidden" value="@Model.Report.Post.Id" />
+                        <input type="hidden" value="@Model.Report.Id" />
+                        <a asp-route-deletePost="@Model.Report.Post.Id" class="btn btn-danger">Delete Post</a>
+                    </form>
+                </div>
+            </div>
+        }
+
+        <div class="row justify-content-center">
+            <div class="col-6 m-2 p-2 text-center">
+                <label for="reasonField">Reason</label>
+                <textarea id="reasonField" class="bg-transparent w-100" readonly style="height: 50%;">@Model.Report.Text</textarea>
+                <form method="post">
+                    <input type="hidden" value="@Model.Report.Id" />
+                    <a asp-route-deleteReport="@Model.Report.Id" class="btn btn-danger">Delete Report</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

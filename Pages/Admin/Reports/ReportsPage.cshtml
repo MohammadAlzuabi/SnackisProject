@@ -1,0 +1,40 @@
+﻿@page
+@model SnackisProject.Pages.Admin.Reports.ReportsPageModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/Index">Admin kontrollpanel</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Reports</li>
+    </ol>
+</nav>
+
+<p class="display-4 text-center">Reports</p>
+
+<hr class="my-4" />
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Created</th>
+            <th>By User</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var report in Model.Reports.OrderBy(r => r.CreatedAt))
+        {
+            <tr>
+                <td>@report.Id</td>
+                <td>@report.CreatedAt</td>
+                <td>@report.ByUser.UserName</td>
+                <td>
+                    <a class="btn btn-primary" asp-page="ManageReport" asp-route-reportId="@report.Id">Manage Report</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

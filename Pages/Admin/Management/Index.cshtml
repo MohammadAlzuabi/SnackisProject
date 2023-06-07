@@ -1,0 +1,17 @@
+﻿@page
+@model SnackisProject.Pages.Admin.Management.IndexModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/Index">Admin kontrollpanel</a></li>
+    </ol>
+</nav>
+
+<div class="badge bg-primary text-wrap" style="width: 80rem;">
+    <a asp-page="CategoryManager" class="text-decoration-none"><h5 class="display-6 text-center p-5 page-link ">Catergory Manager</h5></a>
+    <a asp-page="RoleManager" class="text-decoration-none"><h5 class="display-6 text-center p-5 page-link">Role Manager</h5></a>
+    <a asp-page="/Admin/Reports/ReportsPage" class="text-decoration-none"><h5 class="display-6 text-center p-5 page-link">Reports Page</h5></a>
+</div>

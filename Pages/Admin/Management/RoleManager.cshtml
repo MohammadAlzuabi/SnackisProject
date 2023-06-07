@@ -1,0 +1,83 @@
+﻿@page
+@model SnackisProject.Pages.Admin.RoleManagerModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Management/Index">Admin kontrollpanel</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Role Manager</li>
+    </ol>
+</nav>
+
+
+<p class="display-3 text-center">Roles Manager</p>
+<hr class="my-4" />
+
+<div class="row justify-content-center">
+    <div class="col-6 -m2">
+        <form method="post">
+            <label for="RoleName"></label>
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <input name="RoleName" id="RoleName" class="w-100 mr-2" />
+                </div>
+                <div class="col-4">
+                    <input type="submit" value="New Role" class="btn btn-info " />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div>
+    <hr />
+    <table class="table table-striped">
+        <tr>
+            <th>Username</th>
+            @foreach (var role in Model.Roles)
+            {
+                <th>@role.Name</th>
+            }
+        </tr>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                @foreach (var role in Model.Roles)
+                {
+                    if (await Model._userManager.IsInRoleAsync(user, role.Name))
+                    {
+                        <td> <a href="?RemoveUserId=@user.Id&Role=@role.Name" class="bg-success text-white p-1 text-decoration-none">Yes</a> </td>
+                    }
+                    else
+                    {
+                        <td> <a href="?AddUserId=@user.Id&Role=@role.Name" class="bg-danger text-white p-1 text-decoration-none">No</a> </td>
+                    }
+                }
+                <td>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+
+
+<div class="badge bg-primary text-wrap" style="width: 80rem;">
+    <a class="btn btn-primary" asp-page="UserRolesManager">User Roles Manager</a>
+</div>
+<hr />
+<br />
+<br />

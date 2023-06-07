@@ -1,0 +1,236 @@
+﻿@page
+@model SnackisProject.Pages.PostPageModel
+@{
+    ViewData["Title"] = @Model.Post.Title;
+}
+
+<div class="container">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="Index">Startsida</a></li>
+            <li class="breadcrumb-item"><a asp-page="SubCategory" asp-route-subcategoryId="@Model.SubCategory.Id">@Model.SubCategory.Name</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Post.Title</li>
+        </ol>
+    </nav>
+
+
+
+    <div class="sticky-top justify-content-center">
+        <div class="col text-center">
+            @if (Model.UserId != null)
+            {
+                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addCommentModal">Skapa kommentar</button>
+            }
+            else
+            {
+                <p><a asp-area="Identity" asp-page="Account/Login">Logga in</a> för att skapa en kommentar!</p>
+            }
+        </div>
+    </div>
+
+    <div class="p-2 p-sm-3 collapse show">
+        <div class="card mb-2">
+            <div class="card-body p-2 p-sm-3" style="background-color: aliceblue">
+                <div class="row">
+                    @if (Model.CreatedByUser != null)
+                    {
+                        <div class="col-3 text-center">
+                            @if (Model.CreatedByUser.ProfileImg != null)
+                            {
+                                <img class="mr-3 rounded border shadow" style="width: 150px; height: 150px; object-fit: cover;" src="data:image/*;base64,@(Convert.ToBase64String(Model.CreatedByUser.ProfileImg))" alt="User image">
+                            }
+                            else
+                            {
+                                <img class="mr-3 rounded border shadow" style="object-fit: cover;" width="100" src="/img/user-profile-icon.jpg" alt="User image">
+                            }
+                            <p class="text-muted">
+                                @Model.CreatedByUser.UserName
+                                @if (Model.UserId != null && Model.CreatedByUser.Id != Model.UserId)
+                                {
+                                    <button class="border-0 bg-transparent nav-item" type="button" data-bs-toggle="modal" data-bs-target="#addMessageModal" data-bs-toUserId="@Model.CreatedByUser.Id" data-bs-toUsername="@Model.CreatedByUser.UserName">
+                                        <span style="font-size: 1rem; color: rgba(0, 0, 0, .55)">
+                                            <i class="fas fa-comment-dots ml-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Skicka meddelande till @Model.CreatedByUser.UserName"></i>
+                                        </span>
+                                        ✉
+                                    </button>
+                                }
+
+                            </p>
+                            <p class="small">@Model.Post.CreatedAt</p>
+                        </div>
+                    }
+                    else
+                    {
+
+                        <div class="col-3 text-center">
+                            <img class="mr-3 rounded border shadow" style="object-fit: cover;" width="100" src="/img/user-profile-icon.jpg" alt="User image">
+                            <p class="text-muted">Okänd Användare</p>
+                            <p class="small">@Model.Post.CreatedAt</p>
+                        </div>
+                    }
+
+                    <div class="col-8 bg-light rounded">
+                        <div class="align-content-center">
+                            <h5 class="text-center">@Model.Post.Title</h5>
+                        </div>
+                        <hr />
+                        <textarea class="bg-transparent border-0 w-100 h-75" readonly>@Model.Post.Text</textarea>
+                    </div>
+                    <div class="col-1 text-right">
+                        @if (Model.UserId != null)
+                        {
+                            <button class="border-0 bg-transparent" type="button" data-bs-toggle="modal" data-bs-target="#addReportModal" data-bs-postId="@Model.Post.Id" data-bs-commentId="">
+                                <span class="text-warning text-right" style="font-size: 1rem;">
+                                    <i class="fas fa-exclamation-triangle text-right" data-bs-toggle="tooltip" data-bs-placement="top" title="Rapportera inlägget"></i>
+                                </span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="my-4" />
+
+    @foreach (var comment in Model.Comments.OrderBy(c => c.CreatedAt))
+    {
+        <div class="card mb-2">
+            <div class="card-body p-2 p-sm-3" style="background-color: whitesmoke">
+                <div class="row">
+                    @if (comment.CreatedByUser != null)
+                    {
+                        <div class="col-3 text-center">
+                            @if (comment.CreatedByUser.ProfileImg != null)
+                            {
+                                <img class="mr-3 rounded border shadow" style="width: 150px; height: 150px; object-fit: cover;" src="data:image/*;base64,@(Convert.ToBase64String(comment.CreatedByUser.ProfileImg))" alt="User image">
+                            }
+                            else
+                            {
+                                <img class="mr-3 rounded border shadow" style="object-fit: cover;" width="150" src="/img/user-profile-icon.jpg" alt="User image">
+                            }
+                            <p class="text-muted">
+                                @comment.CreatedByUser.UserName
+                            </p>
+                            <p class="small">@comment.CreatedAt</p>
+                        </div>
+                    }
+                    <div class="col-8 bg-light rounded">
+                        <textarea class="bg-transparent border-0 w-100 h-100" readonly>@comment.Text</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<!-- Add Comment Modal -->
+<div class="modal fade" id="addCommentModal" tabindex="-1" aria-labelledby="addCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddComment">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCommentModalLabel">Skapa kommentar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <input type="hidden" asp-for="Comment.PostId" value="@Model.Post.Id" />
+                    <input type="hidden" asp-for="Comment.UserId" value="@Model.UserId" />
+                    <div class="form-floating mb-3">
+                        <textarea id="floatingTextarea" class="form-control" style="width: 100%; height: 50%" placeholder="Innehåll" asp-for="Comment.Text"></textarea>
+                        <label for="floatingTextarea">Innehåll</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                    <button type="submit" class="btn btn-primary">Skapa kommentar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Report Modal -->
+<div class="modal fade" id="addReportModal" tabindex="-1" aria-labelledby="addReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="CreateReport">
+                <div class="modal-body justify-content-center">
+                    <input type="hidden" asp-for="Report.PostId" value="@Model.Post.Id" />
+                    <input type="hidden" asp-for="Report.ByUser" value="@Model.UserId" />
+                    <input id="reportPostId" type="hidden" asp-for="Report.PostId" />
+                    <div class="form-floating mb-3">
+                        <textarea id="floatingTextarea" class="form-control justify-self-center" style="width: 100%; height: 50%" placeholder="Anledning" asp-for="Report.Text"></textarea>
+                        <label for="floatingTextarea">Anledning</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                    <button type="submit" class="btn btn-primary">Skicka rapport</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Add Report Modal end -->
+
+<!-- Add Message Modal -->
+<div class="modal fade" id="addMessageModal" tabindex="-1" aria-labelledby="addMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="SendMessage">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMessageModalLabel">Skicka meddelande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <input type="hidden" asp-for="SendMessage.FromUser" value="@Model.UserId" />
+                    <input id="messageToUserId" type="hidden" asp-for="SendMessage.ToUser" />
+                    <div class="form-floating mb-3">
+                        <textarea id="floatingTextarea" class="form-control justify-self-center" style="width: 100%; height: 50%" placeholder="Meddelande" asp-for="SendMessage.Text"></textarea>
+                        <label for="floatingTextarea">Meddelande</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                    <button type="submit" class="btn btn-primary">Skicka meddelande</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Add Message Modal end -->
+
+
+
+
+
+
+<script>
+    // Add Report
+    var addReportModal = document.getElementById('addReportModal');
+    addReportModal.addEventListener('show.bs.modal',
+        function (event) {
+            var button = event.relatedTarget;
+            // Attributes
+            var reportPostId = button.getAttribute('data-bs-postId');
+            // Fields
+            var postIdInput = addReportModal.querySelector('#reportPostId');
+            // Apply
+            postIdInput.value = reportPostId;
+        });
+
+    var addMessageModal = document.getElementById('addMessageModal');
+    addMessageModal.addEventListener('show.bs.modal',
+        function (event) {
+            var button = event.relatedTarget;
+            // Attributes
+            var messageToUserId = button.getAttribute('data-bs-toUserId');
+            var messageToUsername = button.getAttribute('data-bs-toUsername');
+            // Fields
+            var toUserIdInput = addMessageModal.querySelector('#messageToUserId');
+            var modalTitle = addMessageModal.querySelector('.modal-title');
+            // Apply
+            toUserIdInput.value = messageToUserId;
+            modalTitle.textContent = 'Skicka meddelande till ' + messageToUsername;
+        });
+</script>

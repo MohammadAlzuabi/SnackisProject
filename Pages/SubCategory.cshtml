@@ -1,0 +1,114 @@
+﻿@page
+@model SnackisProject.Pages.SubCategoryModel
+@{
+    ViewData["Title"] = Model.SubCategory.Name;
+}
+
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="Index">Startsida</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.SubCategory.Name</li>
+    </ol>
+</nav>
+
+@if (Model.UserId != null)
+{
+    <div class="sticky-top justify-content-center">
+        <div class="col text-center">
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addPostModal">Skapa Inlägg</button>
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-center"><a asp-area="Identity" asp-page="Account/Login">Logga in</a> för att skapa ett inlägg!</p>
+}
+
+<h1 class="text-center">@Model.SubCategory.Name</h1>
+
+<hr class="my-4" />
+
+
+@if (Model.Posts.Count == 0)
+{
+    <p class="text-center">Det finns inga inlägg i detta ämnet.</p>
+}
+else
+{
+    @foreach (var post in Model.Posts.OrderBy(p => p.CreatedAt))
+    {
+
+        <div class="row justify-content-center">
+            <div class="col-8 rounded border border-dark bg-light m-1">
+                @if (post.CreatedByUser != null)
+                {
+                    <div class="row justify-content-center text-center m-1">
+                        <div class="col-4 offset-2">
+                            <p class="small">Skapad av: @post.CreatedByUser.FirstName @post.CreatedByUser.LastName</p>
+                        </div>
+                        <div class="col-3 offset-1">
+                            <p class="small">@post.CreatedAt</p>
+                        </div>
+                        <div class="col-1 offset-1">
+                            @if (Model.User.IsInRole("Admin"))
+                            {
+                                <div class="row">
+                                    <div class="col-8">
+                                        <form method="post" asp-page-handler="DeletePost">
+                                            <input type="hidden" asp-for="SubcategoryId" value="@Model.SubCategory.Id" />
+                                            <input type="hidden" asp-for="PostId" value="@post.Id" />
+                                            <a asp-route-deletePost="@post.Id" class="btn btn-danger" class="border-0 bg-transparent">
+                                                Delete
+                                            </a>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row justify-content-center text-center m-1">
+                        <div class="col align-content-center">
+                            <a class="text-center" asp-page="PostPage" asp-route-postId="@post.Id">
+                                <h5>@post.Title</h5>
+                            </a>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+<!-- Add Post Modal -->
+<div class="modal fade" id="addPostModal" tabindex="-1" aria-labelledby="addPostModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddPost">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPostModalLabel">Skapa inlägg</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <input type="hidden" asp-for="Post.UserId" value="@Model.UserId" />
+                    <input type="hidden" asp-for="Post.SubCategoryId" value="@Model.SubCategory.Id" />
+                    <div class="form-group mb-3">
+                        <div class="form-floating mb-2">
+                            <input id="floatingTitleInput" class="form-control" placeholder="Titel" asp-for="Post.Title" />
+                            <label for="floatingTitleInput">Titel</label>
+                        </div>
+                        <div class="form-floating">
+                            <textarea id="floatingTextarea" class="form-control" style="width: 100%; height: 50%" placeholder="Innehåll" asp-for="Post.Text"></textarea>
+                            <label for="floatingTextarea">Innehåll</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                    <button type="submit" class="btn btn-primary">Skapa inlägg</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

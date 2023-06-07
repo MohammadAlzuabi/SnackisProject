@@ -1,0 +1,138 @@
+﻿@page
+@model SnackisProject.Pages.User.MyMessagesModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">Startsida</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Meddelanden</li>
+    </ol>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-8 text-center">
+            <h3>Inkorg</h3>
+            <div class="accordion" id="accordionInboxMessages">
+                @{
+                    var num = 1;
+                }
+                @foreach (var message in Model.Messages.OrderByDescending(m => m.SentAt))
+                {
+                    var heading = "heading" + num;
+                    var collapse = "collapse" + num;
+                    var collapseId = "#collapse" + num;
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="@heading">
+                            @if (message.IsRead)
+                            {
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="@collapseId" aria-expanded="false" aria-controls="@collapse">
+                                    <span class="text-left">
+                                        @if (message.FromUser.ProfileImg != null)
+                                        {
+                                            <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 30px" src="data:image/*;base64,@(Convert.ToBase64String(message.FromUser.ProfileImg))" alt="User image">
+                                        }
+                                        else
+                                        {
+                                            <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 30px" src="/img/user-profile-icon.jpg" alt="User image">
+                                        }
+                                        Meddelande från @message.FromUser.UserName Skickades @message.SentAt
+                                    </span>
+                                </button>
+                            }
+                            else
+                            {
+                                <form method="post">
+                                    <input type="hidden" asp-for="ReplyMessage.Id" value="@message.Id" />
+                                    <input type="hidden" asp-for="ReplyMessage.Text" value="@message.Text" />
+                                    <input type="hidden" asp-for="ReplyMessage.SentAt" value="@message.SentAt" />
+                                    <input type="hidden" asp-for="ReplyMessage.FromUser" value="@message.FromUser.Id" />
+                                    <input type="hidden" asp-for="ReplyMessage.ToUser" value="@message.CurrentUser.Id" />
+                                    <input type="hidden" asp-for="ReplyMessage.IsRead" value="@true" />
+                                    <button class="accordion-button" type="submit" data-bs-toggle="collapse" data-bs-target="@collapseId" aria-expanded="false" aria-controls="@collapse">
+                                        <span class="text-left">
+                                            @if (message.FromUser.ProfileImg != null)
+                                            {
+                                                <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 30px" src="data:image/*;base64,@(Convert.ToBase64String(message.FromUser.ProfileImg))" alt="User image">
+                                            }
+                                            else
+                                            {
+                                                <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 30px" src="/img/user-profile-icon.jpg" alt="User image">
+                                            }
+                                            <strong>Meddelande från @message.FromUser.UserName Skickades @message.SentAt</strong>
+                                        </span>
+                                    </button>
+                                </form>
+                            }
+                        </h2>
+                        <div id="@collapse" class="accordion-collapse collapse show" aria-labelledby="@heading" data-bs-parent="#accordionInboxMessages">
+                            <div class="accordion-body">
+                                <textarea class="bg-transparent border-0 w-100" style="height: 100%" readonly>@message.Text</textarea>
+                            </div>
+                            <div class="row justify-content-end">
+                                <div class="col-2">
+                                    <button class="border-0 bg-transparent nav-item" type="button" data-bs-toggle="modal" data-bs-target="#replyMessageModal" data-bs-toUserId="@message.FromUser.Id" data-bs-toUsername="@message.FromUser.UserName" data-bs-fromUserId="@message.CurrentUser.Id">
+                                        <span style="font-size: 1rem; color: rgba(0, 0, 0, .55)">
+                                            <i class="fas fa-comment-dots ml-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Svara på meddelande från @message.FromUser.UserName"></i>
+                                            Svara
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    num++;
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Message Modal -->
+<div class="modal fade" id="replyMessageModal" tabindex="-1" aria-labelledby="replyMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="ReplyMessage">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="replyMessageModalLabel">Skicka meddelande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <input id="messageFromUserId" type="hidden" asp-for="ReplyMessage.FromUser" />
+                    <input id="messageToUserId" type="hidden" asp-for="ReplyMessage.ToUser" />
+                    <div class="form-floating mb-3">
+                        <textarea id="floatingTextarea" class="form-control justify-self-center" style="width: 100%; height: 50%" placeholder="Meddelande" asp-for="ReplyMessage.Text"></textarea>
+                        <label for="floatingTextarea">Meddelande</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                    <button type="submit" class="btn btn-primary">Skicka meddelande</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Reply Message Modal end -->
+
+<script>
+    // Reply Message
+    var replyMessageModal = document.getElementById('replyMessageModal');
+    replyMessageModal.addEventListener('show.bs.modal',
+        function (event) {
+            var button = event.relatedTarget;
+            // Attributes
+            var messageToUserId = button.getAttribute('data-bs-toUserId');
+            var messageFromUserId = button.getAttribute('data-bs-fromUserId');
+            var messageToUsername = button.getAttribute('data-bs-toUsername');
+            // Fields
+            var toUserIdInput = replyMessageModal.querySelector('#messageToUserId');
+            var fromUserIdInput = replyMessageModal.querySelector('#messageFromUserId');
+            var modalTitle = replyMessageModal.querySelector('.modal-title');
+            // Apply
+            toUserIdInput.value = messageToUserId;
+            fromUserIdInput.value = messageFromUserId;
+            modalTitle.textContent = 'Skicka meddelande till ' + messageToUsername;
+        });
+</script>
